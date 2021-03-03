@@ -9,18 +9,39 @@
       placeholder="请输入密码"
       v-model="formData.password"
     />
-    <button>登录</button>
+    <input type="text" v-model="formData.code" placeholder="请输入验证码" />
+    <div v-html="codeSvg"></div>
+    <button @click="login">登录</button>
   </div>
 </template>
 
 <script>
+import * as publicApi from '@/api/public'
+import * as userApi from '@/api/user'
+import { v4 as uuidv4 } from 'uuid'
 export default {
   data() {
     return {
-      formData: {}
+      formData: {},
+      codeSvg: null
     }
   },
-  mounted() {}
+  mounted() {
+    this.getCaptcha()
+  },
+  methods: {
+    getCaptcha() {
+      this.formData.uuid = uuidv4()
+      publicApi.getCaptcha({ uuid: this.formData.uuid }).then((res) => {
+        this.codeSvg = res.data
+      })
+    },
+    login() {
+      userApi.login(this.formData).then((res) => {
+        console.log(res)
+      })
+    }
+  }
 }
 </script>
 
